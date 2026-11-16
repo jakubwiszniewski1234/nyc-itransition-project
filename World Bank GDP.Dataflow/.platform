@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Dataflow",
+    "displayName": "World Bank GDP"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "01cfa6b3-f2eb-bbe6-40dd-318d10cdeaa8"
+  }
+}

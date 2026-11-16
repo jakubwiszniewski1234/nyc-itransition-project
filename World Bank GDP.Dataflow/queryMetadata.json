@@ -1,0 +1,50 @@
+{
+  "formatVersion": "202502",
+  "computeEngineSettings": {
+    "allowModernEvaluationEngine": true
+  },
+  "name": "World Bank GDP",
+  "queryGroups": [],
+  "documentLocale": "en-US",
+  "queriesMetadata": {
+    "FetchWorldBankGDP": {
+      "queryId": "f1eb903c-145f-441c-8112-8472e7168491",
+      "queryName": "FetchWorldBankGDP",
+      "loadEnabled": false
+    },
+    "Query1_DataDestination": {
+      "queryId": "eee33ad1-70ba-40cd-a91d-316eff709754",
+      "queryName": "Query1_DataDestination",
+      "isHidden": true,
+      "loadEnabled": false
+    },
+    "FetchFXECBRates": {
+      "queryId": "eb7badee-6153-4fb0-af70-807a55990a5c",
+      "queryName": "FetchFXECBRates",
+      "loadEnabled": false
+    },
+    "FetchFXECBRates_DataDestination": {
+      "queryId": "1bad302b-0d0e-4993-880f-a9c5e62002ea",
+      "queryName": "FetchFXECBRates_DataDestination",
+      "isHidden": true,
+      "loadEnabled": false
+    }
+  },
+  "connections": [
+    {
+      "path": "Lakehouse",
+      "kind": "Lakehouse",
+      "connectionId": "{\"ClusterId\":\"28510227-e5b4-472f-a455-06110ecf8241\",\"DatasourceId\":\"95c25e01-2f37-4090-b337-61349f496381\"}"
+    },
+    {
+      "path": "https://api.worldbank.org/",
+      "kind": "Web",
+      "connectionId": "{\"ClusterId\":\"28510227-e5b4-472f-a455-06110ecf8241\",\"DatasourceId\":\"a12488e1-af24-4851-8f1f-8c9d19770f2f\"}"
+    },
+    {
+      "path": "https://data-api.ecb.europa.eu/service/data/EXR/D.USD.EUR.SP00.A",
+      "kind": "Web",
+      "connectionId": "{\"ClusterId\":\"28510227-e5b4-472f-a455-06110ecf8241\",\"DatasourceId\":\"ecf29c17-7138-461a-bdba-afc13dac3fc1\"}"
+    }
+  ]
+}

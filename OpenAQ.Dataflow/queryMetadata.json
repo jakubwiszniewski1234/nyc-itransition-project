@@ -1,0 +1,64 @@
+{
+  "formatVersion": "202502",
+  "computeEngineSettings": {
+    "allowModernEvaluationEngine": true
+  },
+  "name": "Dataflow Gen2",
+  "queryGroups": [],
+  "documentLocale": "en-US",
+  "queriesMetadata": {
+    "ApiKey": {
+      "queryId": "778ce9be-8bbf-4b54-8136-00bdcf6cf7ab",
+      "queryName": "ApiKey",
+      "loadEnabled": false
+    },
+    "NYC_Locations": {
+      "queryId": "f7b3e893-ed78-4c08-a7fb-5cbb2adf5078",
+      "queryName": "NYC_Locations",
+      "loadEnabled": false
+    },
+    "GetLocationsAfterYear": {
+      "queryId": "9483963a-f9a3-4aa3-9b9c-7bce614e74d0",
+      "queryName": "GetLocationsAfterYear",
+      "loadEnabled": false
+    },
+    "ExpandSensorData": {
+      "queryId": "74adf16e-3f54-48ec-aa97-4e7a33eb228a",
+      "queryName": "ExpandSensorData",
+      "loadEnabled": false
+    },
+    "FetchSensorData": {
+      "queryId": "e5e0a8a6-b1fb-4b00-8e5b-8cc75dcf96fe",
+      "queryName": "FetchSensorData",
+      "loadEnabled": false
+    },
+    "OpenAQ_Daily_Measurements": {
+      "queryId": "a7b1e4c4-116a-4512-aaaf-499de6823062",
+      "queryName": "OpenAQ_Daily_Measurements",
+      "loadEnabled": false
+    },
+    "OpenAQ_Daily_Measurements_DataDestination": {
+      "queryId": "babe355b-caf7-410c-987c-42f555091c1e",
+      "queryName": "OpenAQ_Daily_Measurements_DataDestination",
+      "isHidden": true,
+      "loadEnabled": false
+    },
+    "FetchSensorHourlyData": {
+      "queryId": "f56d16d8-27c6-4079-94f3-60fc69e203d2",
+      "queryName": "FetchSensorHourlyData",
+      "loadEnabled": false
+    }
+  },
+  "connections": [
+    {
+      "path": "Lakehouse",
+      "kind": "Lakehouse",
+      "connectionId": "{\"ClusterId\":\"28510227-e5b4-472f-a455-06110ecf8241\",\"DatasourceId\":\"95c25e01-2f37-4090-b337-61349f496381\"}"
+    },
+    {
+      "path": "https://api.openaq.org/v3",
+      "kind": "Web",
+      "connectionId": "{\"ClusterId\":\"28510227-e5b4-472f-a455-06110ecf8241\",\"DatasourceId\":\"835bc164-4d8a-45a5-b88a-27332b14763a\"}"
+    }
+  ]
+}
