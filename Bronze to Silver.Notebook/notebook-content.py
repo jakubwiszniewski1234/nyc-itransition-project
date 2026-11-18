@@ -26,8 +26,36 @@
 
 # CELL ********************
 
+%pip install geopandas shapely
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 from pyspark.sql import functions as F
 from pyspark.sql.window import Window
+import pandas as pd
+import pyspark.sql.types as T
+import geopandas as gpd
+import shapely as shp
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+def show_null_count(df):
+    df.select([F.sum(F.when(F.col(c).isNull(), 1).otherwise(0)).alias(c) for c in df.columns]).show()
 
 # METADATA ********************
 
@@ -156,8 +184,6 @@ df_gdp = df_gdp.select(
     F.col("gdp_usd")
 ).filter(F.col("year").between(2008, 2026))
 
-def show_null_count(df):
-    df.select([F.sum(F.when(F.col(c).isNull(), 1).otherwise(0)).alias(c) for c in df.columns]).show()
 show_null_count(df_gdp)
 display(df_gdp.summary())
 
@@ -550,6 +576,426 @@ plt.show()
 # CELL ********************
 
 df_aq.select(["sensor_id", "location_id", "date_utc", "parameter", "daily_avg", "daily_min", "daily_max", "units", "percent_complete", "latitude", "longitude"]).write.format("delta").mode("overwrite").saveAsTable("silver.air_quality_measurements")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# ## Transforming Taxi tables
+
+# CELL ********************
+
+df_taxi_yellow = spark.read.table("bronze.yellow_taxi_trips_2010_2026")
+df_taxi_yellow.printSchema()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+print(df_taxi_yellow.count())
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_yellow = df_taxi_yellow.select(
+    F.to_utc_timestamp(F.col("tpep_pickup_datetime").cast("timestamp"), "America/New_York").alias("pickup_datetime_utc"),
+    F.to_utc_timestamp(F.col("tpep_dropoff_datetime").cast("timestamp"), "America/New_York").alias("dropoff_datetime_utc"),
+    F.col("trip_distance").cast("double"),
+    F.col("pickup_longitude").cast("double"),
+    F.col("pickup_latitude").cast("double"),
+    F.col("dropoff_longitude").cast("double"),
+    F.col("dropoff_latitude").cast("double"),
+    F.col("PULocationID").cast("int").alias("pickup_location_id"),
+    F.col("DOLocationID").cast('int').alias("dropoff_location_id"),
+    F.col("total_amount").cast("double").alias("total_amount_usd"),
+    F.lit("yellow").alias("taxi_type")
+)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# Some locations are written as lat/long and some as location ids. We need to convert them into location IDs.
+# 
+# We're going to use spacial data available at NYC TLC website.
+
+# CELL ********************
+
+geospacial_rows = df_taxi_yellow.filter(F.col("pickup_location_id").isNull())
+zone_rows = df_taxi_yellow.filter(F.col("pickup_location_id").isNotNull())
+
+import geopandas as gpd
+from pyspark.sql import functions as F
+
+unique_coords = (
+    geospacial_rows
+    .select(
+        F.round(F.col("pickup_longitude").cast("double"), 4).alias("lon"),
+        F.round(F.col("pickup_latitude").cast("double"), 4).alias("lat")
+    )
+    .filter(F.col("lon").isNotNull() & F.col("lat").isNotNull() & (F.col("lon") != 0.0) & (F.col("lat") != 0.0))
+    .distinct()
+    .toPandas()
+)
+
+taxi_zones = gpd.read_file("/lakehouse/default/Files/taxi_zones/taxi_zones.shp").to_crs("EPSG:4326")[["LocationID", "geometry"]]
+points_gdf = gpd.GeoDataFrame(
+    unique_coords,
+    geometry=gpd.points_from_xy(unique_coords["lon"], unique_coords["lat"]),
+    crs="EPSG:4326"
+)
+lookup_pdf = (
+    gpd.sjoin(points_gdf, taxi_zones, how="inner", predicate="within")[["lon", "lat", "LocationID"]]
+    .drop_duplicates(subset=["lon", "lat"])
+)
+
+lookup_sdf = F.broadcast(spark.createDataFrame(lookup_pdf))
+
+mapped = (
+    geospacial_rows
+    .withColumn("pu_lon_r", F.round(F.col("pickup_longitude").cast("double"), 4))
+    .withColumn("pu_lat_r", F.round(F.col("pickup_latitude").cast("double"), 4))
+    .join(lookup_sdf, (F.col("pu_lon_r") == F.col("lon")) & (F.col("pu_lat_r") == F.col("lat")), "left")
+    .withColumn("pickup_location_id", F.col("LocationID").cast("int"))
+    .drop("pu_lon_r", "pu_lat_r", "lon", "lat", "LocationID")
+)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_yellow = (
+    zone_rows
+    .unionByName(mapped)
+    .fillna({"pickup_location_id": 264, "dropoff_location_id": 264})
+    .drop("pickup_longitude", "pickup_latitude", "dropoff_longitude", "dropoff_latitude")
+)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+display(df_taxi_yellow.limit(10))
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+show_null_count(df_taxi_yellow)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_yellow.count()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_yellow = df_taxi_yellow.drop_duplicates()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_yellow = df_taxi_yellow.filter(df_taxi_yellow["total_amount_usd"] > 0)
+df_taxi_yellow.write.format("delta").mode("overwrite").saveAsTable("silver.taxi_trips")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# ### Transform green taxi data
+
+# CELL ********************
+
+df_taxi_green = spark.read.table("bronze.green_taxi_trips")
+df_taxi_green.count()
+df_taxi_green.printSchema()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_green = df_taxi_green.select(
+    F.to_utc_timestamp(F.col("lpep_pickup_datetime").cast("timestamp"), "America/New_York").alias("pickup_datetime_utc"),
+    F.to_utc_timestamp(F.col("lpep_dropoff_datetime").cast("timestamp"), "America/New_York").alias("dropoff_datetime_utc"),
+    F.col("trip_distance").cast("double"),
+    F.col("PULocationID").cast("int").alias("pickup_location_id"),
+    F.col("DOLocationID").cast('int').alias("dropoff_location_id"),
+    F.col("total_amount").cast("double").alias("total_amount_usd"),
+    F.lit("green").alias("taxi_type")
+)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+show_null_count(df_taxi_green)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+print(df_taxi_green.count())
+df_taxi_green = df_taxi_green.drop_duplicates()
+print(df_taxi_green.count())
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_green = df_taxi_green.filter(df_taxi_green["total_amount_usd"] > 0)
+df_taxi_green = df_taxi_green.filter(df_taxi_green["trip_distance"] >= 0)
+display(df_taxi_green.summary())
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+display(df_taxi_green.orderBy("total_amount_usd", ascending=False).limit(50))
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+(
+    df_taxi_green
+    .filter(F.col("total_amount_usd") > 200)
+    .withColumn(
+        "fare_bucket",
+        F.when(F.col("total_amount_usd") <= 350, "$200 - $350")
+         .when(F.col("total_amount_usd") <= 600, "$350 - $600")
+         .otherwise("> $600")
+    )
+    .groupBy("fare_bucket")
+    .agg(
+        F.count("*").alias("trips"),
+        F.round(F.percentile_approx("trip_distance", 0.5), 1).alias("median_miles"),
+        F.round(F.percentile_approx(
+            (F.unix_timestamp("dropoff_datetime_utc") - F.unix_timestamp("pickup_datetime_utc")) / 60.0, 0.5
+        ), 1).alias("median_minutes")
+    )
+    .orderBy("fare_bucket")
+    .show()
+)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_green = df_taxi_green.filter(df_taxi_green["total_amount_usd"] <= 350)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_green.filter(df_taxi_green["trip_distance"] == 0).count()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_green = (
+    df_taxi_green
+    .withColumn(
+        "duration_sec",
+        F.unix_timestamp("dropoff_datetime_utc") - F.unix_timestamp("pickup_datetime_utc")
+    )
+    .filter(
+        ~((F.col("trip_distance") == 0) & 
+        ~F.coalesce((F.col("duration_sec") >= 60) & (F.col("total_amount_usd") >= 2.50), F.lit(False)))
+        )
+    .drop("duration_sec")
+)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_green
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_green.write.format("delta").mode("append").saveAsTable("silver.taxi_trips")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi = spark.read.table("silver.taxi_trips")
+df_taxi = df_taxi.filter(df_taxi["total_amount_usd"] <= 350)
+df_taxi = (
+    df_taxi
+    .withColumn(
+        "duration_sec",
+        F.unix_timestamp("dropoff_datetime_utc") - F.unix_timestamp("pickup_datetime_utc")
+    )
+    .filter(
+        ~((F.col("trip_distance") == 0) & 
+        ~F.coalesce((F.col("duration_sec") >= 60) & (F.col("total_amount_usd") >= 2.50), F.lit(False)))
+        )
+    .drop("duration_sec")
+)
+df_taxi.write.format("delta").mode("overwrite").saveAsTable("silver.taxi_trips")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# ### For-Hire taxi trips
+
+# CELL ********************
+
+df_taxi_fhv = spark.read.table("bronze.fhv_taxi_trips")
+df_taxi_fhv.printSchema()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+display(df_taxi_fhv.limit(30))
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_fhvhv = spark.read.table("bronze.fhvhv_taxi_trips")
+df_taxi_fhvhv.printSchema()
 
 # METADATA ********************
 
