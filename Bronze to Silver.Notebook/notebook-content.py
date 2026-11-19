@@ -1101,7 +1101,7 @@ df_taxi_fhvhv.printSchema()
 
 # CELL ********************
 
-df_taxi_fhvhv.groupBy("airport_fee").count().show()
+df_taxi_fhvhv.count()
 
 # METADATA ********************
 
@@ -1112,7 +1112,18 @@ df_taxi_fhvhv.groupBy("airport_fee").count().show()
 
 # CELL ********************
 
-df_taxi_fhvhv.count()
+spark.sql("SELECT COUNT(*) FROM silver.taxi_trips WHERE taxi_type = 'fhvhv'").show()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_fhvhv.groupBy("airport_fee").count().show()
 
 # METADATA ********************
 
@@ -1150,10 +1161,44 @@ df_taxi_fhvhv = df_taxi_fhvhv.select(
 
 # CELL ********************
 
-fee_columns = ["base_passenger_fare", "tolls", "bcf", "sales_tax", "congestion_surcharge", "tips", "airport_fee"]
+fee_columns = ["base_passenger_fare", "tolls", "bcf", "sales_tax", "congestion_surcharge", "tips", "airport_fee", "cbd_congestion_fee"]
+display(df_taxi_fhvhv[fee_columns].summary())
 
-for fee_column in fee_columns:
-    df_taxi_fhvhv = df_taxi_fhvhv.filter((F.col(fee_column) >= 0))
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+total_amount_usd = F.round(
+    sum(F.coalesce(F.col(c).cast("double"), F.lit(0.0)) for c in fee_columns),
+    2
+)
+
+df_taxi_fhvhv = df_taxi_fhvhv.withColumn("total_amount_usd", total_amount_usd)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_fhvhv = df_taxi_fhvhv.select(
+    F.col("pickup_datetime_utc"),
+    F.col("dropoff_datetime_utc"),
+    F.col("trip_distance"),
+    F.col("pickup_location_id"),
+    F.col("dropoff_location_id"),
+    F.col("total_amount_usd"),
+    F.col("taxi_type")
+)
+df_taxi_fhvhv.write.format("delta").mode("append").saveAsTable("silver.taxi_trips")
 
 # METADATA ********************
 
@@ -1176,6 +1221,16 @@ display(df_taxi_fhvhv.summary())
 # CELL ********************
 
 df_taxi_fhvhv.count()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 
 # METADATA ********************
 
