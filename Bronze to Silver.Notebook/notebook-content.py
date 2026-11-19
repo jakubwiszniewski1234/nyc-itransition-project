@@ -983,6 +983,86 @@ df_taxi_fhv.printSchema()
 
 # CELL ********************
 
+df_taxi_fhv = df_taxi_fhv.select(
+    F.to_utc_timestamp(F.col("pickup_datetime").cast("timestamp"), "America/New_York").alias("pickup_datetime_utc"),
+    F.to_utc_timestamp(F.col("dropOff_datetime").cast("timestamp"), "America/New_York").alias("dropoff_datetime_utc"),
+    F.col("PULocationID").cast("int").alias("pickup_location_id"),
+    F.col("DOLocationID").cast('int').alias("dropoff_location_id"),
+    F.lit(None).alias("total_amount_usd"),
+    F.lit("fhv").alias("taxi_type")
+)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+display(df_taxi_fhv.summary())
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+display(df_taxi_fhv.groupBy("pickup_location_id").count())
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_fhv = df_taxi_fhv.withColumn("pickup_location_id", 
+    F.when(F.col("pickup_location_id") == -1, F.lit(None))
+    .otherwise(F.col("pickup_location_id"))
+    )
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+display(df_taxi_fhv.groupBy("pickup_datetime_utc").count().orderBy("pickup_datetime_utc").limit(100))
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_fhv = df_taxi_fhv.withColumn("dropoff_datetime_utc", 
+    F.when(F.col("dropoff_datetime_utc") < F.lit("2015-01-01"), 
+    F.lit(None))
+    .otherwise(F.col("dropoff_datetime_utc"))
+)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 display(df_taxi_fhv.limit(30))
 
 # METADATA ********************
@@ -994,8 +1074,108 @@ display(df_taxi_fhv.limit(30))
 
 # CELL ********************
 
+df_taxi_fhv.write.format("delta").mode("append").saveAsTable("silver.taxi_trips")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# ### Transforming FHVHV
+
+# CELL ********************
+
 df_taxi_fhvhv = spark.read.table("bronze.fhvhv_taxi_trips")
 df_taxi_fhvhv.printSchema()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_fhvhv.groupBy("airport_fee").count().show()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_fhvhv.count()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_fhvhv = df_taxi_fhvhv.select(
+    F.to_utc_timestamp(F.col("pickup_datetime").cast("timestamp"), "America/New_York").alias("pickup_datetime_utc"),
+    F.to_utc_timestamp(F.col("dropoff_datetime").cast("timestamp"), "America/New_York").alias("dropoff_datetime_utc"),
+    F.col("trip_miles").cast("double").alias("trip_distance"),
+    F.col("PULocationID").cast("int").alias("pickup_location_id"),
+    F.col("DOLocationID").cast('int').alias("dropoff_location_id"),
+    F.col("base_passenger_fare").cast("double"),
+    F.col("tolls").cast("double"),
+    F.col("bcf").cast("double"),
+    F.col("sales_tax").cast("double"),
+    F.col("congestion_surcharge").cast("double"),
+    F.col("cbd_congestion_fee").cast("float"),
+    F.col("tips").cast("double"),
+    F.col("airport_fee").cast("double"),
+    F.lit(0).cast("double").alias("total_amount_usd"),
+    F.lit("fhvhv").alias("taxi_type")
+)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+fee_columns = ["base_passenger_fare", "tolls", "bcf", "sales_tax", "congestion_surcharge", "tips", "airport_fee"]
+
+for fee_column in fee_columns:
+    df_taxi_fhvhv = df_taxi_fhvhv.filter((F.col(fee_column) >= 0))
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+display(df_taxi_fhvhv.summary())
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_taxi_fhvhv.count()
 
 # METADATA ********************
 
