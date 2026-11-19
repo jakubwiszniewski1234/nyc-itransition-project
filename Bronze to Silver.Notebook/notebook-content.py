@@ -645,9 +645,6 @@ df_taxi_yellow = df_taxi_yellow.select(
 geospacial_rows = df_taxi_yellow.filter(F.col("pickup_location_id").isNull())
 zone_rows = df_taxi_yellow.filter(F.col("pickup_location_id").isNotNull())
 
-import geopandas as gpd
-from pyspark.sql import functions as F
-
 unique_coords = (
     geospacial_rows
     .select(
@@ -659,12 +656,14 @@ unique_coords = (
     .toPandas()
 )
 
+
 taxi_zones = gpd.read_file("/lakehouse/default/Files/taxi_zones/taxi_zones.shp").to_crs("EPSG:4326")[["LocationID", "geometry"]]
 points_gdf = gpd.GeoDataFrame(
     unique_coords,
     geometry=gpd.points_from_xy(unique_coords["lon"], unique_coords["lat"]),
     crs="EPSG:4326"
 )
+
 lookup_pdf = (
     gpd.sjoin(points_gdf, taxi_zones, how="inner", predicate="within")[["lon", "lat", "LocationID"]]
     .drop_duplicates(subset=["lon", "lat"])
@@ -1221,6 +1220,132 @@ display(df_taxi_fhvhv.summary())
 # CELL ********************
 
 df_taxi_fhvhv.count()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# ## Creating a sensor table with mapped zones
+
+# CELL ********************
+
+df_sensors = spark.read.table("silver.air_quality_measurements")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_sensors[["sensor_id", "longitude", "latitude"]].distinct().count()
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_sensors_locations = df_sensors[["sensor_id", "longitude", "latitude"]]
+
+coords = df_sensors_locations.select(
+    F.round(F.col("longitude").cast("double"), 4).alias("lon"),
+    F.round(F.col("latitude").cast("double"), 4).alias("lat")
+).distinct().toPandas()
+
+def load_taxi_zones():
+    return gpd.read_file("/lakehouse/default/Files/taxi_zones/taxi_zones.shp").to_crs("EPSG:4326")[["LocationID", "geometry"]]
+
+def create_points(coords):
+    return gpd.GeoDataFrame(
+        coords,
+        geometry=gpd.points_from_xy(coords["lon"], coords["lat"]),
+        crs="EPSG:4326"
+    )
+
+def lookup_zones(coords):
+    return (
+        gpd.sjoin(create_points(coords), load_taxi_zones(), how="inner", predicate="within")[["lon", "lat", "LocationID"]]
+        .drop_duplicates(subset=["lon", "lat"])
+    )
+
+lookup = lookup_zones(coords)
+lookup_broadcast = F.broadcast(spark.createDataFrame(lookup))
+
+mapped = (
+    df_sensors_locations
+    .withColumn("lon_r", F.round(F.col("longitude").cast("double"), 4))
+    .withColumn("lat_r", F.round(F.col("latitude").cast("double"), 4))
+    .join(lookup_broadcast, (F.col("lon_r") == F.col("lon")) & (F.col("lat_r") == F.col("lat")), "left")
+    .withColumn("zone_id", F.col("LocationID").cast("int"))
+    .drop("lon_r", "lat_r", "lon", "lat", "LocationID")
+)
+
+display(mapped)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+mapped = mapped.withColumn("zone_id", F.when(F.col("zone_id").isNull(), 264).otherwise(F.col("zone_id")))
+sensor_zone_lookup = F.broadcast(
+    mapped.select("sensor_id", "zone_id").dropDuplicates(["sensor_id"])
+)
+
+df_sensors = (
+    df_sensors.join(sensor_zone_lookup, on="sensor_id", how="left")
+    .withColumn("zone_id", F.coalesce(F.col("zone_id")))
+    .drop("longitude", "latitude", "location_id")
+)
+display(df_sensors)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_sensors.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable("silver.air_quality_measurements")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# MARKDOWN ********************
+
+# Transform zones to DimZones
+
+# CELL ********************
+
+taxi_zones:pd.DataFrame = gpd.read_file("/lakehouse/default/Files/taxi_zones/taxi_zones.shp").to_crs("EPSG:4326")[["LocationID", "geometry"]]
+centroids = taxi_zones.to_crs("EPSG:2263").geometry.centroid.to_crs("EPSG:4326")
+taxi_zones["longitude"] = centroids.x.round(6)
+taxi_zones["latitude"] = centroids.y.round(6)
+taxi_zones = taxi_zones.drop(columns=["geometry"])
+zones_description = spark.read.table("bronze.taxi_zones").toPandas()
+dim_zone = spark.createDataFrame(taxi_zones.merge(zones_description, how="right", on="LocationID"))
+dim_zone.write.format("delta").mode("overwrite").saveAsTable("silver.DimZone")
 
 # METADATA ********************
 
