@@ -1,0 +1,78 @@
+table DimZone
+	lineageTag: 48c1e6da-bf6b-4ccd-bbbf-1db1a5a72e6a
+	sourceLineageTag: [gold].[DimZone]
+
+	column zone_key
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 1c8d1214-ca43-4b08-9a9a-f19a3df4e77f
+		sourceLineageTag: zone_key
+		summarizeBy: none
+		sourceColumn: zone_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column borough
+		dataType: string
+		sourceProviderType: varchar(50)
+		lineageTag: 1cd2dc00-bb25-47d7-86d6-288db23ec5b4
+		sourceLineageTag: borough
+		summarizeBy: none
+		sourceColumn: borough
+
+		annotation SummarizationSetBy = Automatic
+
+	column zone_name
+		dataType: string
+		sourceProviderType: varchar(100)
+		lineageTag: 6c3a1b00-8eac-403f-8f20-a47ec0d0c6a1
+		sourceLineageTag: zone_name
+		summarizeBy: none
+		sourceColumn: zone_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column service_zone
+		dataType: string
+		sourceProviderType: varchar(50)
+		lineageTag: 2f9894dd-dbbc-4e48-834b-5cc846f2a8f1
+		sourceLineageTag: service_zone
+		summarizeBy: none
+		sourceColumn: service_zone
+
+		annotation SummarizationSetBy = Automatic
+
+	column latitude
+		dataType: double
+		sourceProviderType: float
+		lineageTag: 62d14889-bcf6-4c5b-9a6b-eec346358c63
+		sourceLineageTag: latitude
+		summarizeBy: none
+		sourceColumn: latitude
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column longitude
+		dataType: double
+		sourceProviderType: float
+		lineageTag: e02cb0df-6c67-414a-8279-27dd727d8014
+		sourceLineageTag: longitude
+		summarizeBy: none
+		sourceColumn: longitude
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition DimZone = entity
+		mode: directLake
+		source
+			entityName: DimZone
+			schemaName: gold
+			expressionSource: DatabaseQuery
+
+	annotation PBI_ResultType = Table
+

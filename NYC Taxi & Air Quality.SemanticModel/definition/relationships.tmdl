@@ -1,0 +1,25 @@
+relationship 1bf13355-6a9a-b44f-d56c-af99d6635cdb
+	fromColumn: FactAirQualityDaily.date_key
+	toColumn: DimDate.date_key
+
+relationship 838994f3-1833-e1b6-8107-6b9dba78c8c3
+	fromColumn: FactTaxiDaily.pickup_zone_key
+	toColumn: DimZone.zone_key
+
+relationship 4745b0bc-2dc0-0c06-9239-56561289b4e9
+	isActive: false
+	fromColumn: FactTaxiDaily.dropoff_zone_key
+	toColumn: DimZone.zone_key
+
+relationship 518e0d75-de79-55df-1692-f2d007db7a27
+	fromColumn: FactTaxiDaily.gdp_key
+	toColumn: DimGDP.gdp_key
+
+relationship 09586ddf-f40a-e142-5921-e7c0e4ee28ef
+	fromColumn: FactTaxiDaily.fx_key
+	toColumn: DimFX.fx_key
+
+relationship 14611d12-3e5d-74ac-20dd-237bb8c93907
+	fromColumn: FactTaxiDaily.pickup_date_key
+	toColumn: DimDate.date_key
+

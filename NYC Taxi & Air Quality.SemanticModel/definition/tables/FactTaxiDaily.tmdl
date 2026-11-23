@@ -1,0 +1,230 @@
+table FactTaxiDaily
+	lineageTag: 1bc2e125-85ee-45ac-a854-dda9c8a8a20f
+	sourceLineageTag: [gold].[FactTaxiDaily]
+
+	measure TotalTrips = SUM(FactTaxiDaily[trip_count])
+		formatString: 0
+		lineageTag: 4cd56655-9dd6-471b-b144-51d7a1784fbc
+
+		changedProperty = Name
+
+		changedProperty = IsHidden
+
+	measure AvgDailyTrips = AVERAGEX(VALUES(DimDate[date]), [TotalTrips])
+		lineageTag: 96e40772-36a7-4f0e-a174-b00a4d80f879
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure TotalRevenueUSD = SUM(FactTaxiDaily[total_revenue_usd])
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 9147187e-0831-4faa-9e48-0e47d363e91d
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure AvgFareUSD = DIVIDE(SUM(FactTaxiDaily[total_revenue_usd]), SUM(FactTaxiDaily[clean_fare_trip_count]))
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 970e41a2-78e8-4989-a7bf-d568e3d05567
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure AvgDistance = DIVIDE(SUM(FactTaxiDaily[total_distance_miles]),SUM(FactTaxiDaily[measured_distance_trip_count]))
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 3e637a33-3970-4dda-b32b-9cbf62ae3538
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure TotalDropoffTrips = CALCULATE([TotalTrips], USERELATIONSHIP(DimZone[zone_key], FactTaxiDaily[dropoff_zone_key]))
+		formatString: 0
+		lineageTag: 92520b34-b9ad-4f02-b572-05cc6beec7ad
+
+		changedProperty = Name
+
+	measure TotalRevenueEUR = SUMX(FactTaxiDaily, FactTaxiDaily[total_revenue_usd] * RELATED(DimFX[usd_to_eur_rate]))
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 4164d2e6-39f8-423e-bd39-3a5dae0b0d71
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure AvgFareEUR = DIVIDE([TotalRevenueEUR], SUM(FactTaxiDaily[clean_fare_trip_count]))
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 0a65973e-490a-464e-9d77-5e3c174bd0aa
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure TaxiRevenuePartOfUSGDP = DIVIDE([TotalRevenueUSD], [US_GDP_USD])
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 8ad9996f-f0ed-4812-a792-617eefd8f55d
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column pickup_date_key
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 7f351d16-4d76-4f5a-b148-41d4d6933eea
+		sourceLineageTag: pickup_date_key
+		summarizeBy: none
+		sourceColumn: pickup_date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column pickup_zone_key
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 7383193f-04de-4d91-9f9c-ee05cbd27d5f
+		sourceLineageTag: pickup_zone_key
+		summarizeBy: none
+		sourceColumn: pickup_zone_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column dropoff_zone_key
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 9ba44bab-e889-4fba-bef2-67213decb295
+		sourceLineageTag: dropoff_zone_key
+		summarizeBy: sum
+		sourceColumn: dropoff_zone_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column fx_key
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 7a496735-3dc2-4f8d-975a-868c06105ed5
+		sourceLineageTag: fx_key
+		summarizeBy: none
+		sourceColumn: fx_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column gdp_key
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: f4b098d7-c184-4a80-b0d9-f13abe6897fa
+		sourceLineageTag: gdp_key
+		summarizeBy: none
+		sourceColumn: gdp_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column taxi_type
+		dataType: string
+		sourceProviderType: varchar(10)
+		lineageTag: 4b51fcb1-eb8b-4335-b3b7-de93ce83cd15
+		sourceLineageTag: taxi_type
+		summarizeBy: none
+		sourceColumn: taxi_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_shared_ride
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: 0d038e45-b75c-4bdb-a2fb-4a9239fc986b
+		sourceLineageTag: is_shared_ride
+		summarizeBy: none
+		sourceColumn: is_shared_ride
+
+		annotation SummarizationSetBy = Automatic
+
+	column trip_count
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 8c08fd82-ca5f-4700-9f59-46d68e5136fe
+		sourceLineageTag: trip_count
+		summarizeBy: sum
+		sourceColumn: trip_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column clean_fare_trip_count
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 2be2b9a9-dec7-4488-beee-eef6d7c3ea8e
+		sourceLineageTag: clean_fare_trip_count
+		summarizeBy: sum
+		sourceColumn: clean_fare_trip_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column measured_distance_trip_count
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: af0ea389-2f59-45d6-9bc2-1a3dc11ffb6e
+		sourceLineageTag: measured_distance_trip_count
+		summarizeBy: sum
+		sourceColumn: measured_distance_trip_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_revenue_usd
+		dataType: decimal
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		sourceProviderType: decimal(14, 2)
+		lineageTag: 14c953b4-2d91-4b48-9651-2c574445358b
+		sourceLineageTag: total_revenue_usd
+		summarizeBy: sum
+		sourceColumn: total_revenue_usd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column total_distance_miles
+		dataType: decimal
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		sourceProviderType: decimal(14, 2)
+		lineageTag: 7bf56deb-20d2-4bc6-8703-958459dd31e0
+		sourceLineageTag: total_distance_miles
+		summarizeBy: sum
+		sourceColumn: total_distance_miles
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column total_duration_minutes
+		dataType: decimal
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		sourceProviderType: decimal(14, 2)
+		lineageTag: 6f4702e2-b4b1-435d-a0ff-c59fe1413065
+		sourceLineageTag: total_duration_minutes
+		summarizeBy: sum
+		sourceColumn: total_duration_minutes
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	partition FactTaxiDaily = entity
+		mode: directLake
+		source
+			entityName: FactTaxiDaily
+			schemaName: gold
+			expressionSource: DatabaseQuery
+
+	annotation PBI_ResultType = Table
+

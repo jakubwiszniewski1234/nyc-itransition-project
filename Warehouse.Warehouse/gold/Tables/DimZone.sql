@@ -9,3 +9,9 @@ CREATE TABLE [gold].[DimZone] (
 
 
 GO
+
+ALTER TABLE [gold].[DimZone]
+    ADD CONSTRAINT [PK_DimZone] PRIMARY KEY NONCLUSTERED ([zone_key] ASC) NOT ENFORCED;
+
+
+GO

@@ -1,0 +1,91 @@
+table DimFX
+	lineageTag: 9ae574b1-ee24-4d78-bd8d-5448e098acba
+	sourceLineageTag: [gold].[DimFX]
+
+	measure AvgUSDtoEURRate = AVERAGE(DimFX[usd_to_eur_rate])
+		lineageTag: b429a387-f5db-4a05-ab7a-902d19a0d5aa
+
+		changedProperty = Name
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column fx_key
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 500cc584-6c5d-446e-8f2e-cc54ef408f9a
+		sourceLineageTag: fx_key
+		summarizeBy: none
+		sourceColumn: fx_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column date
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: date
+		lineageTag: 2cfaa454-a595-4606-8a95-687e26cc4d52
+		sourceLineageTag: date
+		summarizeBy: none
+		sourceColumn: date
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column usd_to_eur_rate
+		dataType: double
+		sourceProviderType: decimal(10, 6)
+		lineageTag: 4ef8bb98-15fb-4451-9376-fec7b4bc8e54
+		sourceLineageTag: usd_to_eur_rate
+		summarizeBy: none
+		sourceColumn: usd_to_eur_rate
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column eur_to_usd_rate
+		dataType: double
+		sourceProviderType: decimal(10, 6)
+		lineageTag: 1d27631d-1923-440a-bab7-974c85ecd5d1
+		sourceLineageTag: eur_to_usd_rate
+		summarizeBy: none
+		sourceColumn: eur_to_usd_rate
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column is_trading_day
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: 4539bd61-d93b-4d7c-a79b-69a36f2ea820
+		sourceLineageTag: is_trading_day
+		summarizeBy: none
+		sourceColumn: is_trading_day
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimFX = entity
+		mode: directLake
+		source
+			entityName: DimFX
+			schemaName: gold
+			expressionSource: DatabaseQuery
+
+	changedProperty = IsHidden
+
+	annotation PBI_ResultType = Table
+

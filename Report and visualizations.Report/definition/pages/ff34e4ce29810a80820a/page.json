@@ -1,0 +1,13 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "ff34e4ce29810a80820a",
+  "displayName": "Mobility",
+  "displayOption": "FitToPage",
+  "height": 1080,
+  "width": 1920,
+  "pageBinding": {
+    "name": "6b477de4b7db20b14840",
+    "type": "Default",
+    "parameters": []
+  }
+}

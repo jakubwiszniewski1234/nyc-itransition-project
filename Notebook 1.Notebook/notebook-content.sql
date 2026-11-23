@@ -22,7 +22,17 @@
 
 -- CELL ********************
 
-print("Hello world")
+SELECT * FROM Lakehouse.silver.taxi_trips LIMIT 1000
+
+-- METADATA ********************
+
+-- META {
+-- META   "language": "sparksql",
+-- META   "language_group": "synapse_pyspark"
+-- META }
+
+-- CELL ********************
+
 
 -- METADATA ********************
 

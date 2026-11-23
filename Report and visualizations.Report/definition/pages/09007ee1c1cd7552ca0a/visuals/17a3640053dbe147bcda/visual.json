@@ -1,0 +1,112 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.15.0/schema.json",
+  "name": "17a3640053dbe147bcda",
+  "position": {
+    "x": 21.285009993337813,
+    "y": 15.827323451032667,
+    "z": 0,
+    "height": 279.97974683544305,
+    "width": 1486.6760826115924,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactAirQualityDaily"
+                    }
+                  },
+                  "Property": "AvgPM2.5"
+                }
+              },
+              "queryRef": "FactAirQualityDaily.AvgPM2.5",
+              "nativeQueryRef": "AvgPM2.5"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactAirQualityDaily"
+                    }
+                  },
+                  "Property": "PeakPM2.5"
+                }
+              },
+              "queryRef": "FactAirQualityDaily.PeakPM2.5",
+              "nativeQueryRef": "PeakPM2.5"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactAirQualityDaily"
+                    }
+                  },
+                  "Property": "AvgNO2"
+                }
+              },
+              "queryRef": "FactAirQualityDaily.AvgNO2",
+              "nativeQueryRef": "AvgNO2"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactAirQualityDaily"
+                    }
+                  },
+                  "Property": "PeakNO2"
+                }
+              },
+              "queryRef": "FactAirQualityDaily.PeakNO2",
+              "nativeQueryRef": "PeakNO2"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactAirQualityDaily"
+                    }
+                  },
+                  "Property": "PollutionSpikeDays"
+                }
+              },
+              "queryRef": "FactAirQualityDaily.PollutionSpikeDays",
+              "nativeQueryRef": "PollutionSpikeDays"
+            }
+          ]
+        },
+        "TrendVisualCategory": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimDate"
+                    }
+                  },
+                  "Property": "year"
+                }
+              },
+              "queryRef": "DimDate.year",
+              "nativeQueryRef": "year"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

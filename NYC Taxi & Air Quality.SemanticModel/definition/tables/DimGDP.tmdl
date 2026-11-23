@@ -1,0 +1,74 @@
+table DimGDP
+	lineageTag: b6e235c6-6e47-492f-ba5a-7c27edaabb7c
+	sourceLineageTag: [gold].[DimGDP]
+
+	measure US_GDP_USD = SUM(DimGDP[gdp_usd])
+		lineageTag: a86e1651-8824-49c5-87e2-6d4599756043
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column gdp_key
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: ec98d614-6d73-43ed-a326-d8afad4d2577
+		sourceLineageTag: gdp_key
+		summarizeBy: none
+		sourceColumn: gdp_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column country_iso3
+		dataType: string
+		sourceProviderType: varchar(3)
+		lineageTag: 33ad1b56-fded-4223-bf04-060a25cf8672
+		sourceLineageTag: country_iso3
+		summarizeBy: none
+		sourceColumn: country_iso3
+
+		annotation SummarizationSetBy = Automatic
+
+	column country_name
+		dataType: string
+		sourceProviderType: varchar(50)
+		lineageTag: faafb744-2903-48a0-b743-d09d89efb896
+		sourceLineageTag: country_name
+		summarizeBy: none
+		sourceColumn: country_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column year
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: a4ca47ff-03dd-48d1-86f8-f5e5c70181a8
+		sourceLineageTag: year
+		summarizeBy: none
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column gdp_usd
+		dataType: double
+		sourceProviderType: decimal(18, 2)
+		lineageTag: 4e9f5105-b8d3-49f4-963a-cf0815d560af
+		sourceLineageTag: gdp_usd
+		summarizeBy: none
+		sourceColumn: gdp_usd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition DimGDP = entity
+		mode: directLake
+		source
+			entityName: DimGDP
+			schemaName: gold
+			expressionSource: DatabaseQuery
+
+	annotation PBI_ResultType = Table
+

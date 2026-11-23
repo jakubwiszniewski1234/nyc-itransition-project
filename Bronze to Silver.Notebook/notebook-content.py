@@ -1356,6 +1356,53 @@ dim_zone.write.format("delta").mode("overwrite").saveAsTable("silver.DimZone")
 
 # CELL ********************
 
+df_taxi = spark.table("silver.taxi_trips")
+
+df_duration_anomalies = (
+    df_taxi
+    .withColumn(
+        "duration_hours",
+        (F.unix_timestamp("dropoff_datetime_utc") - F.unix_timestamp("pickup_datetime_utc")) / 3600.0
+    )
+    .filter((F.col("duration_hours") < 0) | (F.col("duration_hours") > 24))
+)
+
+print(f"wrong durations rows: {df_duration_anomalies.count()}")
+df_duration_anomalies.select(
+    "taxi_type", "pickup_datetime_utc", "dropoff_datetime_utc", "duration_hours", "trip_distance", "total_amount_usd"
+).show(10, truncate=False)
+
+df_taxi_clean = (
+    spark.table("silver.taxi_trips")
+    .withColumn(
+        "duration_sec",
+        F.unix_timestamp("dropoff_datetime_utc") - F.unix_timestamp("pickup_datetime_utc")
+    )
+    .filter(
+        F.col("pickup_datetime_utc").between("2015-01-01 00:00:00", "2026-12-31 23:59:59") &
+        F.col("dropoff_datetime_utc").between("2015-01-01 00:00:00", "2027-01-01 23:59:59") &
+        (F.col("duration_sec") >= 0) &
+        (F.col("duration_sec") <= 24 * 60 * 60)
+    )
+    .drop("duration_sec")
+)
+
+(
+    df_taxi_clean.write
+    .format("delta")
+    .mode("overwrite")
+    .saveAsTable("silver.taxi_trips")
+)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 
 # METADATA ********************
 

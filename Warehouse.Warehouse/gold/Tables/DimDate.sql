@@ -11,3 +11,9 @@ CREATE TABLE [gold].[DimDate] (
 
 
 GO
+
+ALTER TABLE [gold].[DimDate]
+    ADD CONSTRAINT [PK_DimDate] PRIMARY KEY NONCLUSTERED ([date_key] ASC) NOT ENFORCED;
+
+
+GO

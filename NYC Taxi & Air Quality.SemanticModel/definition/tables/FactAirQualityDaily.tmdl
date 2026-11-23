@@ -1,0 +1,163 @@
+table FactAirQualityDaily
+	lineageTag: 821739c7-7e2e-437d-b618-f3e57710a5b7
+	sourceLineageTag: [gold].[FactAirQualityDaily]
+
+	measure 'AvgPM2.5' = AVERAGE(FactAirQualityDaily[avg_pm25])
+		lineageTag: b413898c-b959-4525-9013-38436dae1fcb
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'PeakPM2.5' = MAX(FactAirQualityDaily[max_pm25])
+		lineageTag: 1ee1d08a-7102-4c7c-8009-f0054f3de401
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure AvgNO2 = AVERAGE(FactAirQualityDaily[avg_no2])
+		lineageTag: 61128ea6-6760-4459-8222-9e1a414182b0
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure PeakNO2 = MAX(FactAirQualityDaily[max_no2])
+		lineageTag: 2ea4cb37-2d97-4379-a81f-a904ad2bb729
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure PollutionSpikeDays = CALCULATE(DISTINCTCOUNT(FactAirQualityDaily[date_key]), FactAirQualityDaily[is_pollution_spike] = TRUE())
+		formatString: 0
+		lineageTag: f0b10c1a-c0e8-45a8-a3f6-0f4d2ff08f81
+
+		changedProperty = Name
+
+	column date_key
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: fa847c0e-5cb2-4200-9fca-b73818f6b63d
+		sourceLineageTag: date_key
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column zone_key
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: f0149376-0593-47a4-abe7-3858b0605e12
+		sourceLineageTag: zone_key
+		summarizeBy: sum
+		sourceColumn: zone_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column avg_pm25
+		dataType: double
+		sourceProviderType: float
+		lineageTag: 563c57dc-8f83-48ea-b86d-00e20e74aae5
+		sourceLineageTag: avg_pm25
+		summarizeBy: sum
+		sourceColumn: avg_pm25
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column min_pm25
+		dataType: double
+		sourceProviderType: float
+		lineageTag: 8bb43c82-aade-4fcf-ade5-99ffc3263e64
+		sourceLineageTag: min_pm25
+		summarizeBy: sum
+		sourceColumn: min_pm25
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column max_pm25
+		dataType: double
+		sourceProviderType: float
+		lineageTag: d52b5c9b-432d-4e9f-a41e-dc811d031932
+		sourceLineageTag: max_pm25
+		summarizeBy: sum
+		sourceColumn: max_pm25
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_no2
+		dataType: double
+		sourceProviderType: float
+		lineageTag: 46fc5d17-f0c0-47c6-aa13-f639c1df9faa
+		sourceLineageTag: avg_no2
+		summarizeBy: sum
+		sourceColumn: avg_no2
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column min_no2
+		dataType: double
+		sourceProviderType: float
+		lineageTag: cf5b8953-f33a-42dc-9938-5db734f16101
+		sourceLineageTag: min_no2
+		summarizeBy: sum
+		sourceColumn: min_no2
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column max_no2
+		dataType: double
+		sourceProviderType: float
+		lineageTag: 82290fdf-feda-4d0d-a0b2-0da7ed68462e
+		sourceLineageTag: max_no2
+		summarizeBy: sum
+		sourceColumn: max_no2
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column active_sensor_count
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 8aa8eaa5-17a8-4785-bf33-2c20c0d2c7c6
+		sourceLineageTag: active_sensor_count
+		summarizeBy: sum
+		sourceColumn: active_sensor_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_pollution_spike
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: 1d8c15f9-477b-407a-a54b-766a6930bad6
+		sourceLineageTag: is_pollution_spike
+		summarizeBy: none
+		sourceColumn: is_pollution_spike
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactAirQualityDaily = entity
+		mode: directLake
+		source
+			entityName: FactAirQualityDaily
+			schemaName: gold
+			expressionSource: DatabaseQuery
+
+	annotation PBI_ResultType = Table
+
