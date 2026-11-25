@@ -4,5 +4,22 @@
   "displayName": "Air quality",
   "displayOption": "FitToPage",
   "height": 1080,
-  "width": 1920
+  "width": 1920,
+  "pageBinding": {
+    "name": "ad4e5755889877ce34e8",
+    "type": "Default",
+    "parameters": []
+  },
+  "visualInteractions": [
+    {
+      "source": "b6e65c7df7fa61bc4888",
+      "target": "987300b8bbbf07520909",
+      "type": "DataFilter"
+    },
+    {
+      "source": "987300b8bbbf07520909",
+      "target": "b6e65c7df7fa61bc4888",
+      "type": "NoFilter"
+    }
+  ]
 }

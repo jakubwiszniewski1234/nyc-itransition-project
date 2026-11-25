@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.15.0/schema.json",
   "name": "990d1cc1d8280cb6da21",
   "position": {
-    "x": 625.45183211192546,
-    "y": 312.72591605596273,
+    "x": 600.89220519653566,
+    "y": 311.08860759493672,
     "z": 1000,
     "height": 301.26475682878083,
-    "width": 1295.1109926715524,
+    "width": 1291.8363757495003,
     "tabOrder": 1000
   },
   "visual": {
@@ -42,11 +42,11 @@
                       "Entity": "FactAirQualityDaily"
                     }
                   },
-                  "Property": "AvgNO2"
+                  "Property": "AvgPM2.5"
                 }
               },
-              "queryRef": "FactAirQualityDaily.AvgNO2",
-              "nativeQueryRef": "AvgNO2"
+              "queryRef": "FactAirQualityDaily.AvgPM2.5",
+              "nativeQueryRef": "AvgPM2.5"
             },
             {
               "field": {
@@ -56,11 +56,11 @@
                       "Entity": "FactAirQualityDaily"
                     }
                   },
-                  "Property": "AvgPM2.5"
+                  "Property": "AvgNO2"
                 }
               },
-              "queryRef": "FactAirQualityDaily.AvgPM2.5",
-              "nativeQueryRef": "AvgPM2.5"
+              "queryRef": "FactAirQualityDaily.AvgNO2",
+              "nativeQueryRef": "AvgNO2"
             }
           ]
         }
@@ -171,6 +171,34 @@
               }
             }
           }
+        },
+        {
+          "properties": {
+            "strokeTransparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "22D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "FactAirQualityDaily.AvgPM2.5"
+          }
+        },
+        {
+          "properties": {
+            "strokeTransparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "17D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "FactAirQualityDaily.AvgNO2"
+          }
         }
       ],
       "zoom": [
@@ -179,7 +207,7 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "false"
                 }
               }
             },
@@ -426,6 +454,46 @@
             "id": "1"
           }
         }
+      ],
+      "dataPoint": [
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 4,
+                      "Percent": 0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "FactAirQualityDaily.AvgPM2.5"
+          }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 3,
+                      "Percent": 0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "FactAirQualityDaily.AvgNO2"
+          }
+        }
       ]
     },
     "visualContainerObjects": {
@@ -441,8 +509,67 @@
             }
           }
         }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "3038cd6b5a242df3accf",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimDate"
+              }
+            },
+            "Property": "date"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "a7f28864e288cfd6c2d3",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FactAirQualityDaily"
+              }
+            },
+            "Property": "AvgNO2"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "cbb17dae328a0ffb9187",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FactAirQualityDaily"
+              }
+            },
+            "Property": "AvgPM2.5"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

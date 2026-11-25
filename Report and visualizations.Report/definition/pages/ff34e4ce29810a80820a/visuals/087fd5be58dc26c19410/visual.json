@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.15.0/schema.json",
   "name": "087fd5be58dc26c19410",
   "position": {
-    "x": 544.12365089940045,
-    "y": 0,
+    "x": 26.196935376415723,
+    "y": 18.010393071285812,
     "z": 0,
-    "height": 216.12471685542974,
-    "width": 831.75269820119922,
+    "height": 207.93817455029981,
+    "width": 902.15696202531649,
     "tabOrder": 0
   },
   "visual": {
@@ -97,6 +97,95 @@
         }
       }
     },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "ba610a1ba8e7ded76d8a",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FactTaxiDaily"
+              }
+            },
+            "Property": "TotalTrips"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "d28d5afb2bce3bdd1945",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FactTaxiDaily"
+              }
+            },
+            "Property": "AvgDailyTrips"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "517a549828e3a7211803",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FactTaxiDaily"
+              }
+            },
+            "Property": "AvgFareUSD"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "388c8e7d96eea9610311",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FactTaxiDaily"
+              }
+            },
+            "Property": "AvgDistance"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "845d71e496789a949b43",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimDate"
+              }
+            },
+            "Property": "year"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

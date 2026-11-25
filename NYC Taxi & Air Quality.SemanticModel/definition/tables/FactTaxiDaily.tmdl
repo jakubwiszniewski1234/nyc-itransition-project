@@ -34,12 +34,12 @@ table FactTaxiDaily
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
 	measure AvgDistance = DIVIDE(SUM(FactTaxiDaily[total_distance_miles]),SUM(FactTaxiDaily[measured_distance_trip_count]))
-		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		formatString: #,0.00
 		lineageTag: 3e637a33-3970-4dda-b32b-9cbf62ae3538
 
 		changedProperty = Name
 
-		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+		changedProperty = FormatString
 
 	measure TotalDropoffTrips = CALCULATE([TotalTrips], USERELATIONSHIP(DimZone[zone_key], FactTaxiDaily[dropoff_zone_key]))
 		formatString: 0
@@ -47,7 +47,7 @@ table FactTaxiDaily
 
 		changedProperty = Name
 
-	measure TotalRevenueEUR = SUMX(FactTaxiDaily, FactTaxiDaily[total_revenue_usd] * RELATED(DimFX[usd_to_eur_rate]))
+	measure TotalRevenueEUR = SUMX(SUMMARIZE(FactTaxiDaily, DimDate[date_key], "DailyUSD", SUM(FactTaxiDaily[total_revenue_usd])), [DailyUSD] * CALCULATE(AVERAGE(DimFX[usd_to_eur_rate])))
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		lineageTag: 4164d2e6-39f8-423e-bd39-3a5dae0b0d71
 
@@ -64,12 +64,12 @@ table FactTaxiDaily
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
 	measure TaxiRevenuePartOfUSGDP = DIVIDE([TotalRevenueUSD], [US_GDP_USD])
-		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		formatString: #,0.000%;-#,0.000%;#,0.000%
 		lineageTag: 8ad9996f-f0ed-4812-a792-617eefd8f55d
 
 		changedProperty = Name
 
-		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+		changedProperty = FormatString
 
 	column pickup_date_key
 		dataType: int64
@@ -110,7 +110,7 @@ table FactTaxiDaily
 		sourceProviderType: int
 		lineageTag: 7a496735-3dc2-4f8d-975a-868c06105ed5
 		sourceLineageTag: fx_key
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: fx_key
 
 		annotation SummarizationSetBy = Automatic
@@ -195,16 +195,16 @@ table FactTaxiDaily
 
 	column total_distance_miles
 		dataType: decimal
-		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		formatString: #,0.00
 		sourceProviderType: decimal(14, 2)
 		lineageTag: 7bf56deb-20d2-4bc6-8703-958459dd31e0
 		sourceLineageTag: total_distance_miles
 		summarizeBy: sum
 		sourceColumn: total_distance_miles
 
-		annotation SummarizationSetBy = Automatic
+		changedProperty = FormatString
 
-		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+		annotation SummarizationSetBy = Automatic
 
 	column total_duration_minutes
 		dataType: decimal

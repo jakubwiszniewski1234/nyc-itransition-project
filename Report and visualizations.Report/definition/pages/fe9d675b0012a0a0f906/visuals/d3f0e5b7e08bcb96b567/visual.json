@@ -1,0 +1,87 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.15.0/schema.json",
+  "name": "d3f0e5b7e08bcb96b567",
+  "position": {
+    "x": 297.99013990672887,
+    "y": 16.373084610259827,
+    "z": 5000,
+    "height": 464.9956029313791,
+    "width": 265.2439706862092,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactTaxiDaily"
+                    }
+                  },
+                  "Property": "TotalRevenueEUR"
+                }
+              },
+              "queryRef": "FactTaxiDaily.TotalRevenueEUR",
+              "nativeQueryRef": "TotalRevenueEUR",
+              "format": "\"€\" #,0.00;-\"€\" #,0.00;\"€\" #,0.00"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactTaxiDaily"
+                    }
+                  },
+                  "Property": "AvgFareEUR"
+                }
+              },
+              "queryRef": "FactTaxiDaily.AvgFareEUR",
+              "nativeQueryRef": "AvgFareEUR",
+              "format": "\"€\" #,0.00;-\"€\" #,0.00;\"€\" #,0.00"
+            }
+          ]
+        },
+        "TrendVisualCategory": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimDate"
+                    }
+                  },
+                  "Property": "year"
+                }
+              },
+              "queryRef": "DimDate.year",
+              "nativeQueryRef": "Sum of year"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "layout": [
+        {
+          "properties": {
+            "orientation": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

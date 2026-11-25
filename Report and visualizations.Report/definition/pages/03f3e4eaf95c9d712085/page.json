@@ -1,8 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
   "name": "03f3e4eaf95c9d712085",
-  "displayName": "Page 1",
+  "displayName": "Mobility vs. Air Quality Correlation",
   "displayOption": "FitToPage",
   "height": 1080,
-  "width": 1920
+  "width": 1920,
+  "pageBinding": {
+    "name": "e22888e4395f787bbcf2",
+    "type": "Default",
+    "parameters": []
+  }
 }

@@ -2,12 +2,17 @@ table DimGDP
 	lineageTag: b6e235c6-6e47-492f-ba5a-7c27edaabb7c
 	sourceLineageTag: [gold].[DimGDP]
 
-	measure US_GDP_USD = SUM(DimGDP[gdp_usd])
+	measure US_GDP_USD = SUMX(VALUES(DimDate[year]), VAR CurrentYear = DimDate[year] RETURN CALCULATE(AVERAGE(DimGDP[gdp_usd]), REMOVEFILTERS(DimGDP), DimGDP[country_iso3] = "USA", DimGDP[year] = CurrentYear))
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		lineageTag: a86e1651-8824-49c5-87e2-6d4599756043
 
 		changedProperty = Name
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
+		changedProperty = IsHidden
+
+		changedProperty = FormatString
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
 	column gdp_key
 		dataType: int64
@@ -17,6 +22,8 @@ table DimGDP
 		sourceLineageTag: gdp_key
 		summarizeBy: none
 		sourceColumn: gdp_key
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -28,6 +35,8 @@ table DimGDP
 		summarizeBy: none
 		sourceColumn: country_iso3
 
+		changedProperty = IsHidden
+
 		annotation SummarizationSetBy = Automatic
 
 	column country_name
@@ -37,6 +46,8 @@ table DimGDP
 		sourceLineageTag: country_name
 		summarizeBy: none
 		sourceColumn: country_name
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -49,19 +60,26 @@ table DimGDP
 		summarizeBy: none
 		sourceColumn: year
 
+		changedProperty = IsHidden
+
 		annotation SummarizationSetBy = Automatic
 
 	column gdp_usd
 		dataType: double
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		sourceProviderType: decimal(18, 2)
 		lineageTag: 4e9f5105-b8d3-49f4-963a-cf0815d560af
 		sourceLineageTag: gdp_usd
 		summarizeBy: none
 		sourceColumn: gdp_usd
 
+		changedProperty = IsHidden
+
+		changedProperty = FormatString
+
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
 	partition DimGDP = entity
 		mode: directLake
@@ -69,6 +87,8 @@ table DimGDP
 			entityName: DimGDP
 			schemaName: gold
 			expressionSource: DatabaseQuery
+
+	changedProperty = IsHidden
 
 	annotation PBI_ResultType = Table
 

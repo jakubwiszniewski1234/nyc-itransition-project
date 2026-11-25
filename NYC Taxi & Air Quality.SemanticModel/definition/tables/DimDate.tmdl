@@ -63,8 +63,11 @@ table DimDate
 		sourceLineageTag: month_name
 		summarizeBy: none
 		sourceColumn: month_name
+		sortByColumn: month
 
 		changedProperty = IsHidden
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
@@ -104,6 +107,19 @@ table DimDate
 		sourceColumn: is_weekend
 
 		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_name
+		dataType: string
+		sourceProviderType: varchar(15)
+		lineageTag: 9135dbf2-7d1e-449b-9fa8-a630f6ab1ce4
+		sourceLineageTag: day_name
+		summarizeBy: none
+		sourceColumn: day_name
+		sortByColumn: day_of_week
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 

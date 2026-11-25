@@ -48,7 +48,7 @@ table DimZone
 		sourceProviderType: float
 		lineageTag: 62d14889-bcf6-4c5b-9a6b-eec346358c63
 		sourceLineageTag: latitude
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: latitude
 
 		annotation SummarizationSetBy = Automatic
@@ -60,7 +60,7 @@ table DimZone
 		sourceProviderType: float
 		lineageTag: e02cb0df-6c67-414a-8279-27dd727d8014
 		sourceLineageTag: longitude
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: longitude
 
 		annotation SummarizationSetBy = Automatic

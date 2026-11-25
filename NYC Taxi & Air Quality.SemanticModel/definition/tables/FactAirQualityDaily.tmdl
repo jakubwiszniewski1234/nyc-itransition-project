@@ -53,7 +53,7 @@ table FactAirQualityDaily
 		sourceProviderType: int
 		lineageTag: f0149376-0593-47a4-abe7-3858b0605e12
 		sourceLineageTag: zone_key
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: zone_key
 
 		annotation SummarizationSetBy = Automatic

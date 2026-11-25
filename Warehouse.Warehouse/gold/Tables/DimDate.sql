@@ -6,7 +6,8 @@ CREATE TABLE [gold].[DimDate] (
     [month_name]  VARCHAR (15) NOT NULL,
     [day]         INT          NOT NULL,
     [day_of_week] INT          NOT NULL,
-    [is_weekend]  BIT          NOT NULL
+    [is_weekend]  BIT          NOT NULL,
+    [day_name]    VARCHAR (15) NULL
 );
 
 

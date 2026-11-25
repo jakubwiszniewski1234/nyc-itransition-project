@@ -17,21 +17,8 @@ table DimFX
 		sourceProviderType: int
 		lineageTag: 500cc584-6c5d-446e-8f2e-cc54ef408f9a
 		sourceLineageTag: fx_key
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: fx_key
-
-		changedProperty = IsHidden
-
-		annotation SummarizationSetBy = Automatic
-
-	column date
-		dataType: dateTime
-		formatString: General Date
-		sourceProviderType: date
-		lineageTag: 2cfaa454-a595-4606-8a95-687e26cc4d52
-		sourceLineageTag: date
-		summarizeBy: none
-		sourceColumn: date
 
 		changedProperty = IsHidden
 
@@ -42,7 +29,7 @@ table DimFX
 		sourceProviderType: decimal(10, 6)
 		lineageTag: 4ef8bb98-15fb-4451-9376-fec7b4bc8e54
 		sourceLineageTag: usd_to_eur_rate
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: usd_to_eur_rate
 
 		changedProperty = IsHidden
@@ -56,7 +43,7 @@ table DimFX
 		sourceProviderType: decimal(10, 6)
 		lineageTag: 1d27631d-1923-440a-bab7-974c85ecd5d1
 		sourceLineageTag: eur_to_usd_rate
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: eur_to_usd_rate
 
 		changedProperty = IsHidden
@@ -75,6 +62,17 @@ table DimFX
 		sourceColumn: is_trading_day
 
 		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_key
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: a211a9d3-da34-4f0c-ad2b-c4aff1ef3fd3
+		sourceLineageTag: date_key
+		summarizeBy: none
+		sourceColumn: date_key
 
 		annotation SummarizationSetBy = Automatic
 

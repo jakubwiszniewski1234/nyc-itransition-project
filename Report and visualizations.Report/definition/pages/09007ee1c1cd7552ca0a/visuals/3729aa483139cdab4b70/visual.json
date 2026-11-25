@@ -3,10 +3,10 @@
   "name": "3729aa483139cdab4b70",
   "position": {
     "x": 21.285009993337777,
-    "y": 312.72591605596273,
+    "y": 311.08860759493672,
     "z": 2000,
-    "height": 767.89766822118588,
-    "width": 587.79373750832781,
+    "height": 749.88727514990012,
+    "width": 566.50872751499,
     "tabOrder": 2000
   },
   "visual": {
@@ -122,21 +122,21 @@
             "zoom": {
               "expr": {
                 "Literal": {
-                  "Value": "9.38D"
+                  "Value": "10D"
                 }
               }
             },
             "centerLatitude": {
               "expr": {
                 "Literal": {
-                  "Value": "40.712772150401776D"
+                  "Value": "40.7427355053872D"
                 }
               }
             },
             "centerLongitude": {
               "expr": {
                 "Literal": {
-                  "Value": "-73.97228000000001D"
+                  "Value": "-73.97800899999999D"
                 }
               }
             },
@@ -148,6 +148,13 @@
               }
             },
             "pitch": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "heading": {
               "expr": {
                 "Literal": {
                   "Value": "0D"
@@ -252,11 +259,11 @@
                         }
                       },
                       "FillRule": {
-                        "linearGradient3": {
+                        "linearGradient2": {
                           "min": {
                             "color": {
                               "Literal": {
-                                "Value": "'#f0e199'"
+                                "Value": "'#f0a787'"
                               }
                             },
                             "value": {
@@ -265,27 +272,15 @@
                               }
                             }
                           },
-                          "mid": {
+                          "max": {
                             "color": {
                               "Literal": {
-                                "Value": "'#eb895f'"
+                                "Value": "'#73361c'"
                               }
                             },
                             "value": {
                               "Literal": {
                                 "Value": "15D"
-                              }
-                            }
-                          },
-                          "max": {
-                            "color": {
-                              "Literal": {
-                                "Value": "'#6b2328'"
-                              }
-                            },
-                            "value": {
-                              "Literal": {
-                                "Value": "35D"
                               }
                             }
                           },
@@ -330,6 +325,159 @@
         }
       ]
     },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'NYC Zones by Avg PM2.5'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "d56d0012a98dddafeb0a",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimZone"
+              }
+            },
+            "Property": "borough"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "d",
+              "Entity": "DimZone",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "Not": {
+                  "Expression": {
+                    "In": {
+                      "Expressions": [
+                        {
+                          "Column": {
+                            "Expression": {
+                              "SourceRef": {
+                                "Source": "d"
+                              }
+                            },
+                            "Property": "borough"
+                          }
+                        }
+                      ],
+                      "Values": [
+                        [
+                          {
+                            "Literal": {
+                              "Value": "null"
+                            }
+                          }
+                        ],
+                        [
+                          {
+                            "Literal": {
+                              "Value": "'Unknown'"
+                            }
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "objects": {
+          "general": [
+            {
+              "properties": {
+                "isInvertedSelectionMode": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "true"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "0c1168df887c72463599",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FactAirQualityDaily"
+              }
+            },
+            "Property": "AvgPM2.5"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "032130c6b2380f3c8bf3",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimZone"
+              }
+            },
+            "Property": "longitude"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "e5334988e1e8af0f2ce1",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimZone"
+              }
+            },
+            "Property": "latitude"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

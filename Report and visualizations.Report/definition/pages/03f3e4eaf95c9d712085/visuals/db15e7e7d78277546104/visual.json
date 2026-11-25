@@ -1,0 +1,85 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.15.0/schema.json",
+  "name": "db15e7e7d78277546104",
+  "position": {
+    "x": 26.196935376415723,
+    "y": 18.010393071285812,
+    "z": 1000,
+    "height": 207.93817455029981,
+    "width": 902.15696202531649,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactTaxiDaily"
+                    }
+                  },
+                  "Property": "AvgDailyTrips"
+                }
+              },
+              "queryRef": "FactTaxiDaily.AvgDailyTrips",
+              "nativeQueryRef": "AvgDailyTrips",
+              "format": "#,0"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactAirQualityDaily"
+                    }
+                  },
+                  "Property": "AvgNO2"
+                }
+              },
+              "queryRef": "FactAirQualityDaily.AvgNO2",
+              "nativeQueryRef": "AvgNO2"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactAirQualityDaily"
+                    }
+                  },
+                  "Property": "AvgPM2.5"
+                }
+              },
+              "queryRef": "FactAirQualityDaily.AvgPM2.5",
+              "nativeQueryRef": "AvgPM2.5"
+            }
+          ]
+        },
+        "TrendVisualCategory": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimDate"
+                    }
+                  },
+                  "Property": "year"
+                }
+              },
+              "queryRef": "DimDate.year",
+              "nativeQueryRef": "year"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
